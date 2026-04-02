@@ -12,13 +12,11 @@ Forkploy includes multiple features to make your life easier.
 
 ## 🚀 Getting Started
 
-To get started, run the following command on a VPS:
+To get started, run the following command on a VPS with dokploy installed:
 
-Want to skip the installation process? [Try the Dokploy Cloud](https://app.dokploy.com).
+docker pull ghcr.io/irazvan2745/dokploy:VERSION
 
-```bash
-curl -sSL https://dokploy.com/install.sh | sh
-```
+docker service update --image ghcr.io/irazvan2745/dokploy:VERSION dokploy
 
 ## 🤝 Contributing
 
