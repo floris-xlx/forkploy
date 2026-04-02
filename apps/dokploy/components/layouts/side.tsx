@@ -19,7 +19,6 @@ import {
 	Forward,
 	GalleryVerticalEnd,
 	GitBranch,
-	Key,
 	KeyRound,
 	Loader2,
 	LogIn,
@@ -387,14 +386,6 @@ const MENU: Menu = {
 			icon: CreditCard,
 			// Only enabled for owners in cloud environments
 			isEnabled: ({ auth, isCloud }) => !!(auth?.role === "owner" && isCloud),
-		},
-		{
-			isSingle: true,
-			title: "License",
-			url: "/dashboard/settings/license",
-			icon: Key,
-			// Only enabled for owners
-			isEnabled: ({ auth }) => !!(auth?.role === "owner"),
 		},
 		{
 			isSingle: true,
@@ -937,7 +928,9 @@ export default function Page({ children }: Props) {
 				</SidebarHeader>
 				<SidebarContent>
 					<SidebarGroup>
-						<SidebarGroupLabel className="border-t-0 sticky top-0">Home</SidebarGroupLabel>
+						<SidebarGroupLabel className="border-t-0 sticky top-0">
+							Home
+						</SidebarGroupLabel>
 						<SidebarMenu>
 							{filteredHome.map((item) => {
 								const isSingle = item.isSingle !== false;

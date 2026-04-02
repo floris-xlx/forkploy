@@ -1,18 +1,15 @@
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
-import {
-	Ban,
-	CheckCircle2,
-	RefreshCcw,
-	Rocket,
-	Terminal,
-} from "lucide-react";
+import { Ban, CheckCircle2, RefreshCcw, Rocket, Terminal } from "lucide-react";
 import { useRouter } from "next/router";
 import { toast } from "sonner";
 import { ShowBuildChooseForm } from "@/components/dashboard/application/build/show";
 import { ShowProviderForm } from "@/components/dashboard/application/general/generic/show";
 import { DialogAction } from "@/components/shared/dialog-action";
 import { Button } from "@/components/ui/button";
-import { ButtonGroup, buttonGroupItemClassName } from "@/components/ui/button-group";
+import {
+	ButtonGroup,
+	buttonGroupItemClassName,
+} from "@/components/ui/button-group";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -213,8 +210,8 @@ export const ShowGeneralApplication = ({ applicationId }: Props) => {
 											<TooltipPrimitive.Portal>
 												<TooltipContent sideOffset={5} className="z-[60]">
 													<p>
-														Start the application (requires a previous successful
-														build)
+														Start the application (requires a previous
+														successful build)
 													</p>
 												</TooltipContent>
 											</TooltipPrimitive.Portal>

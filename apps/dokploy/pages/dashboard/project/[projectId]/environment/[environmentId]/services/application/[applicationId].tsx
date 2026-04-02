@@ -116,7 +116,7 @@ const Service = (
 				</title>
 			</Head>
 			<div className="w-full">
-				<Card className="h-full bg-sidebar border-none -mx-4 rounded-xl w-[calc(100svw-19.5rem)]">
+				<Card className="h-full bg-sidebar border-none -mx-4 -mt-8 rounded-xl w-[calc(100svw-19.5rem)]">
 					<div className="rounded-xl bg-background shadow-md ">
 						<CardHeader className="flex flex-row justify-between items-center">
 							<div className="flex flex-col">
