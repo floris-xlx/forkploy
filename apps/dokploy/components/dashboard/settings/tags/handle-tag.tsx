@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Palette, PenBoxIcon, PlusIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import type { ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -53,11 +54,21 @@ type Tag = z.infer<typeof TagSchema>;
 
 interface HandleTagProps {
 	tagId?: string;
+	open?: boolean;
+	hideTrigger?: boolean;
+	onOpenChange?: (open: boolean) => void;
+	trigger?: ReactNode;
 }
 
-export const HandleTag = ({ tagId }: HandleTagProps) => {
+export const HandleTag = ({
+	tagId,
+	open,
+	hideTrigger = false,
+	onOpenChange,
+	trigger,
+}: HandleTagProps) => {
 	const utils = api.useUtils();
-	const [isOpen, setIsOpen] = useState(false);
+	const [internalOpen, setInternalOpen] = useState(false);
 	const colorInputRef = useRef<HTMLInputElement>(null);
 
 	const { mutateAsync, error, isError } = tagId
@@ -113,21 +124,42 @@ export const HandleTag = ({ tagId }: HandleTagProps) => {
 	};
 
 	const colorValue = form.watch("color");
+	const isControlled = open !== undefined;
+	const isOpen = open ?? internalOpen;
+
+	const setDialogOpen = (nextOpen: boolean) => {
+		if (!isControlled) {
+			setInternalOpen(nextOpen);
+		}
+		onOpenChange?.(nextOpen);
+	};
 
 	return (
-		<Dialog open={isOpen} onOpenChange={setIsOpen}>
-			<DialogTrigger asChild>
-				{tagId ? (
-					<Button variant="ghost" size="icon" className="h-8 w-8">
-						<PenBoxIcon className="h-4 w-4" />
-					</Button>
-				) : (
-					<Button>
-						<PlusIcon className="h-4 w-4" />
-						Create Tag
-					</Button>
-				)}
-			</DialogTrigger>
+		<Dialog
+			open={isOpen}
+			onOpenChange={setDialogOpen}
+		>
+			{!hideTrigger && (
+				<DialogTrigger asChild>
+					{trigger ? (
+						trigger
+					) : tagId ? (
+						<Button variant="ghost" size="icon" className="h-8 w-8">
+							<PenBoxIcon className="h-4 w-4" />
+						</Button>
+					) : (
+						<Button
+							type="button"
+							onClick={(event) => {
+								event.stopPropagation();
+							}}
+						>
+							<PlusIcon className="h-4 w-4" />
+							Create Tag
+						</Button>
+					)}
+				</DialogTrigger>
+			)}
 			<DialogContent className="sm:max-w-lg">
 				<DialogHeader>
 					<DialogTitle>{tagId ? "Update" : "Create"} Tag</DialogTitle>
