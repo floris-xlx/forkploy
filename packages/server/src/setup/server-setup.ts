@@ -466,21 +466,21 @@ const installUtilities = () => `
 
 	case "$OS_TYPE" in
 	arch)
-		$SUDO_CMD pacman -Sy --noconfirm --needed curl wget git git-lfs jq openssl >/dev/null || true
+		$SUDO_CMD pacman -Sy --noconfirm --needed curl wget git git-lfs jq openssl rsync >/dev/null || true
 		;;
 	alpine)
 		$SUDO_CMD sed -i '/^#.*\/community/s/^#//' /etc/apk/repositories
 		$SUDO_CMD apk update >/dev/null
-		$SUDO_CMD apk add curl wget git git-lfs jq openssl sudo unzip tar >/dev/null
+		$SUDO_CMD apk add curl wget git git-lfs jq openssl sudo unzip tar rsync >/dev/null
 		;;
 	ubuntu | debian | raspbian)
 		export DEBIAN_FRONTEND=noninteractive
 		$SUDO_CMD apt-get update -y >/dev/null
-		$SUDO_CMD apt-get install -y unzip curl wget git git-lfs jq openssl >/dev/null
+		$SUDO_CMD apt-get install -y unzip curl wget git git-lfs jq openssl rsync >/dev/null
 		;;
 	centos | fedora | rhel | ol | rocky | almalinux | opencloudos | amzn)
 		if [ "$OS_TYPE" = "amzn" ]; then
-			$SUDO_CMD dnf install -y wget git git-lfs jq openssl >/dev/null
+			$SUDO_CMD dnf install -y wget git git-lfs jq openssl rsync >/dev/null
 		else
 			if ! command -v dnf >/dev/null; then
 				$SUDO_CMD yum install -y dnf >/dev/null
@@ -488,12 +488,12 @@ const installUtilities = () => `
 			if ! command -v curl >/dev/null; then
 				$SUDO_CMD dnf install -y curl >/dev/null
 			fi
-			$SUDO_CMD dnf install -y wget git git-lfs jq openssl unzip >/dev/null
+			$SUDO_CMD dnf install -y wget git git-lfs jq openssl unzip rsync >/dev/null
 		fi
 		;;
 	sles | opensuse-leap | opensuse-tumbleweed)
 		$SUDO_CMD zypper refresh >/dev/null
-		$SUDO_CMD zypper install -y curl wget git git-lfs jq openssl >/dev/null
+		$SUDO_CMD zypper install -y curl wget git git-lfs jq openssl rsync >/dev/null
 		;;
 	*)
 		echo "This script only supports Debian, Redhat, Arch Linux, or SLES based operating systems for now."

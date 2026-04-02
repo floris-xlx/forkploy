@@ -58,7 +58,7 @@ const Mariadb = (
 	const router = useRouter();
 	const { projectId, environmentId } = router.query;
 	const [tab, setSab] = useState<TabState>(activeTab);
-	const { data } = api.mariadb.one.useQuery({ mariadbId });
+	const { data, refetch } = api.mariadb.one.useQuery({ mariadbId });
 	const { data: auth } = api.user.get.useQuery();
 	const { data: permissions } = api.user.getPermissions.useQuery();
 
@@ -86,7 +86,7 @@ const Mariadb = (
 						{appName}
 					</title>
 				</Head>
-				<Card className="h-full bg-sidebar  p-2.5 rounded-xl w-full">
+				<Card className="h-full bg-sidebar p-0 border-none -mx-4 -mt-8 w-[calc(100svw-19.5rem)] rounded-xl">
 					<div className="rounded-xl bg-background shadow-md ">
 						<CardHeader className="flex flex-row justify-between items-center">
 							<div className="flex flex-col">
@@ -301,6 +301,8 @@ const Mariadb = (
 												<ShowDatabaseAdvancedSettings
 													id={mariadbId}
 													type="mariadb"
+													serviceName={data?.name || data?.appName || "MariaDB"}
+													currentServerId={data?.serverId}
 												/>
 											</div>
 										</TabsContent>

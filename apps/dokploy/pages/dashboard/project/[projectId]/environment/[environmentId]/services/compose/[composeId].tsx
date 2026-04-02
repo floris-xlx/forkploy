@@ -31,6 +31,7 @@ import { UpdateCompose } from "@/components/dashboard/compose/update-compose";
 import { ShowBackups } from "@/components/dashboard/database/backups/show-backups";
 import { ComposePaidMonitoring } from "@/components/dashboard/monitoring/paid/container/show-paid-compose-monitoring";
 import { DashboardLayout } from "@/components/layouts/dashboard-layout";
+import { MigrateService } from "@/components/dashboard/shared/migrate-service";
 import { AdvanceBreadcrumb } from "@/components/shared/advance-breadcrumb";
 import { StatusTooltip } from "@/components/shared/status-tooltip";
 import { Badge } from "@/components/ui/badge";
@@ -83,7 +84,7 @@ const Service = (
 		}
 	}, [router.query.tab]);
 
-	const { data } = api.compose.one.useQuery({ composeId });
+	const { data, refetch } = api.compose.one.useQuery({ composeId });
 
 	const { data: auth } = api.user.get.useQuery();
 	const { data: permissions } = api.user.getPermissions.useQuery();
@@ -178,7 +179,6 @@ const Service = (
 										{permissions?.service.create && (
 											<UpdateCompose composeId={composeId} />
 										)}
-
 										{permissions?.service.delete && (
 											<DeleteService id={composeId} type="compose" />
 										)}
@@ -383,6 +383,13 @@ const Service = (
 									{permissions?.service.create && (
 										<TabsContent value="advanced">
 											<div className="flex flex-col gap-4 pt-2.5">
+												<MigrateService
+													serviceId={composeId}
+													serviceName={data?.name || data?.appName || "Compose"}
+													serviceType="compose"
+													currentServerId={data?.serverId}
+													onSuccess={() => refetch()}
+												/>
 												<AddCommandCompose composeId={composeId} />
 												<ShowVolumes id={composeId} type="compose" />
 												<ShowImport composeId={composeId} />

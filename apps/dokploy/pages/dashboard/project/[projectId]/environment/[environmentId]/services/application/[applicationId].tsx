@@ -35,6 +35,7 @@ import { DeleteService } from "@/components/dashboard/compose/delete-service";
 import { ContainerFreeMonitoring } from "@/components/dashboard/monitoring/free/container/show-free-container-monitoring";
 import { ContainerPaidMonitoring } from "@/components/dashboard/monitoring/paid/container/show-paid-container-monitoring";
 import { DashboardLayout } from "@/components/layouts/dashboard-layout";
+import { MigrateService } from "@/components/dashboard/shared/migrate-service";
 import { AdvanceBreadcrumb } from "@/components/shared/advance-breadcrumb";
 import { StatusTooltip } from "@/components/shared/status-tooltip";
 import { Badge } from "@/components/ui/badge";
@@ -83,7 +84,7 @@ const Service = (
 		}
 	}, [router.query.tab]);
 
-	const { data } = api.application.one.useQuery(
+	const { data, refetch } = api.application.one.useQuery(
 		{ applicationId },
 		{
 			refetchInterval: 5000,
@@ -401,6 +402,13 @@ const Service = (
 									{permissions?.service.create && (
 										<TabsContent value="advanced">
 											<div className="flex flex-col gap-4 pt-2.5">
+												<MigrateService
+													serviceId={applicationId}
+													serviceName={data?.name || data?.appName || "Application"}
+													serviceType="application"
+													currentServerId={data?.serverId}
+													onSuccess={() => refetch()}
+												/>
 												<AddCommand applicationId={applicationId} />
 												<ShowClusterSettings
 													id={applicationId}

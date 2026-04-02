@@ -20,6 +20,7 @@ import { sendBuildSuccessNotifications } from "@dokploy/server/utils/notificatio
 import {
 	ExecError,
 	execAsync,
+	execAsyncStream,
 	execAsyncRemote,
 } from "@dokploy/server/utils/process/execAsync";
 import { cloneBitbucketRepository } from "@dokploy/server/utils/providers/bitbucket";
@@ -209,10 +210,12 @@ export const deployCompose = async ({
 	composeId,
 	titleLog = "Manual deployment",
 	descriptionLog = "",
+	onData,
 }: {
 	composeId: string;
 	titleLog: string;
 	descriptionLog: string;
+	onData?: (data: string) => void;
 }) => {
 	const compose = await findComposeById(composeId);
 
@@ -247,9 +250,13 @@ export const deployCompose = async ({
 
 		let commandWithLog = `(${command}) >> ${deployment.logPath} 2>&1`;
 		if (compose.serverId) {
-			await execAsyncRemote(compose.serverId, commandWithLog);
+			await execAsyncRemote(compose.serverId, commandWithLog, onData);
 		} else {
-			await execAsync(commandWithLog);
+			if (onData) {
+				await execAsyncStream(commandWithLog, onData);
+			} else {
+				await execAsync(commandWithLog);
+			}
 		}
 		command = "set -e;";
 		if (compose.sourceType !== "raw") {
@@ -263,9 +270,13 @@ export const deployCompose = async ({
 		command += await getBuildComposeCommand(entity);
 		commandWithLog = `(${command}) >> ${deployment.logPath} 2>&1`;
 		if (compose.serverId) {
-			await execAsyncRemote(compose.serverId, commandWithLog);
+			await execAsyncRemote(compose.serverId, commandWithLog, onData);
 		} else {
-			await execAsync(commandWithLog);
+			if (onData) {
+				await execAsyncStream(commandWithLog, onData);
+			} else {
+				await execAsync(commandWithLog);
+			}
 		}
 
 		await updateDeploymentStatus(deployment.deploymentId, "done");

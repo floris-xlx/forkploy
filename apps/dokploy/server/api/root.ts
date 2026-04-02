@@ -40,6 +40,7 @@ import { rollbackRouter } from "./routers/rollbacks";
 import { scheduleRouter } from "./routers/schedule";
 import { securityRouter } from "./routers/security";
 import { serverRouter } from "./routers/server";
+import { serviceMigrationRouter } from "./routers/service-migration";
 import { settingsRouter } from "./routers/settings";
 import { sshRouter } from "./routers/ssh-key";
 import { swarmRouter } from "./routers/swarm";
@@ -83,6 +84,7 @@ export const appRouter = createTRPCRouter({
 	registry: registryRouter,
 	security: securityRouter,
 	server: serverRouter,
+	serviceMigration: serviceMigrationRouter,
 	settings: settingsRouter,
 	sshKey: sshRouter,
 	swarm: swarmRouter,

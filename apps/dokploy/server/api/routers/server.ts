@@ -236,6 +236,10 @@ export const serverRouter = createTRPCRouter({
 						enabled: boolean;
 						version: string;
 					};
+					rsync: {
+						enabled: boolean;
+						version: string;
+					};
 					nixpacks: {
 						enabled: boolean;
 						version: string;

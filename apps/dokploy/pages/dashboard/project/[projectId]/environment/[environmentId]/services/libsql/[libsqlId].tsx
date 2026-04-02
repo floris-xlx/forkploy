@@ -57,7 +57,7 @@ const Libsql = (
 	const router = useRouter();
 	const { projectId, environmentId } = router.query;
 	const [tab, setSab] = useState<TabState>(activeTab);
-	const { data } = api.libsql.one.useQuery({ libsqlId });
+	const { data, refetch } = api.libsql.one.useQuery({ libsqlId });
 	const { data: auth } = api.user.get.useQuery();
 
 	const { data: isCloud } = api.settings.isCloud.useQuery();
@@ -74,7 +74,7 @@ const Libsql = (
 						Dokploy
 					</title>
 				</Head>
-				<Card className="h-full bg-sidebar  p-2.5 rounded-xl w-full">
+				<Card className="h-full bg-sidebar p-0 border-none -mx-4 -mt-8 w-[calc(100svw-19.5rem)] rounded-xl">
 					<div className="rounded-xl bg-background shadow-md ">
 						<CardHeader className="flex flex-row justify-between items-center">
 							<div className="flex flex-col">
@@ -273,6 +273,8 @@ const Libsql = (
 											<ShowDatabaseAdvancedSettings
 												id={libsqlId}
 												type="libsql"
+												serviceName={data?.name || data?.appName || "Libsql"}
+												currentServerId={data?.serverId}
 											/>
 										</div>
 									</TabsContent>

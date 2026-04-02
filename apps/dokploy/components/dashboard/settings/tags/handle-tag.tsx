@@ -115,7 +115,7 @@ export const HandleTag = ({
 			.then(async () => {
 				await utils.tag.all.invalidate();
 				toast.success(tagId ? "Tag Updated" : "Tag Created");
-				setIsOpen(false);
+				setDialogOpen(false);
 				form.reset();
 			})
 			.catch(() => {

@@ -6,7 +6,6 @@ import type {
 	InferGetServerSidePropsType,
 } from "next";
 import Head from "next/head";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { type ReactElement, useState } from "react";
 import superjson from "superjson";
@@ -57,7 +56,7 @@ const MySql = (
 	const router = useRouter();
 	const { projectId, environmentId } = router.query;
 	const [tab, setSab] = useState<TabState>(activeTab);
-	const { data } = api.mysql.one.useQuery({ mysqlId });
+	const { data, refetch } = api.mysql.one.useQuery({ mysqlId });
 	const { data: auth } = api.user.get.useQuery();
 	const { data: permissions } = api.user.getPermissions.useQuery();
 
@@ -85,7 +84,7 @@ const MySql = (
 					</title>
 				</Head>
 				<div className="w-full">
-					<Card className="h-full bg-sidebar  p-2.5 rounded-xl w-full">
+					<Card className="h-full bg-sidebar p-0 border-none -mx-4 -mt-8 w-[calc(100svw-19.5rem)] rounded-xl">
 						<div className="rounded-xl bg-background shadow-md ">
 							<CardHeader className="flex flex-row justify-between items-center">
 								<div className="flex flex-col">
@@ -277,6 +276,8 @@ const MySql = (
 													<ShowDatabaseAdvancedSettings
 														id={mysqlId}
 														type="mysql"
+														serviceName={data?.name || data?.appName || "MySQL"}
+														currentServerId={data?.serverId}
 													/>
 												</div>
 											</TabsContent>

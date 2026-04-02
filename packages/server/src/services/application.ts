@@ -15,6 +15,7 @@ import { sendBuildSuccessNotifications } from "@dokploy/server/utils/notificatio
 import {
 	ExecError,
 	execAsync,
+	execAsyncStream,
 	execAsyncRemote,
 } from "@dokploy/server/utils/process/execAsync";
 import { cloneBitbucketRepository } from "@dokploy/server/utils/providers/bitbucket";
@@ -169,10 +170,12 @@ export const deployApplication = async ({
 	applicationId,
 	titleLog = "Manual deployment",
 	descriptionLog = "",
+	onData,
 }: {
 	applicationId: string;
 	titleLog: string;
 	descriptionLog: string;
+	onData?: (data: string) => void;
 }) => {
 	const application = await findApplicationById(applicationId);
 	const serverId = application.buildServerId || application.serverId;
@@ -216,9 +219,13 @@ export const deployApplication = async ({
 
 		const commandWithLog = `(${command}) >> ${deployment.logPath} 2>&1`;
 		if (serverId) {
-			await execAsyncRemote(serverId, commandWithLog);
+			await execAsyncRemote(serverId, commandWithLog, onData);
 		} else {
-			await execAsync(commandWithLog);
+			if (onData) {
+				await execAsyncStream(commandWithLog, onData);
+			} else {
+				await execAsync(commandWithLog);
+			}
 		}
 
 		await mechanizeDockerContainer(application);

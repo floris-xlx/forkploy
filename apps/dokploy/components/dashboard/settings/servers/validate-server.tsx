@@ -95,15 +95,26 @@ export const ValidateServer = ({ serverId }: Props) => {
 											}
 										/>
 										{!isBuildServer && (
-											<StatusRow
-												label="RClone Installed"
-												isEnabled={data?.rclone?.enabled}
-												description={
-													data?.rclone?.enabled
-														? `Installed: ${data?.rclone?.version}`
-														: undefined
-												}
-											/>
+											<>
+												<StatusRow
+													label="RClone Installed"
+													isEnabled={data?.rclone?.enabled}
+													description={
+														data?.rclone?.enabled
+															? `Installed: ${data?.rclone?.version}`
+															: undefined
+													}
+												/>
+												<StatusRow
+													label="Rsync Installed"
+													isEnabled={data?.rsync?.enabled}
+													description={
+														data?.rsync?.enabled
+															? `Installed: ${data?.rsync?.version}`
+															: undefined
+													}
+												/>
+											</>
 										)}
 										<StatusRow
 											label="Nixpacks Installed"
