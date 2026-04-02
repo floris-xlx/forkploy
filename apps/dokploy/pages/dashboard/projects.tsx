@@ -7,7 +7,6 @@ import superjson from "superjson";
 import { ShowProjects } from "@/components/dashboard/projects/show";
 import { DashboardLayout } from "@/components/layouts/dashboard-layout";
 import { appRouter } from "@/server/api/root";
-import { api } from "@/utils/api";
 
 const ShowWelcomeDokploy = dynamic(
 	() =>
@@ -18,11 +17,8 @@ const ShowWelcomeDokploy = dynamic(
 );
 
 const Dashboard = () => {
-	const { data: isCloud } = api.settings.isCloud.useQuery();
 	return (
 		<>
-			{isCloud && <ShowWelcomeDokploy />}
-
 			<ShowProjects />
 		</>
 	);

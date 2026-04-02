@@ -96,6 +96,14 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import {
+	ContextMenu,
+	ContextMenuContent,
+	ContextMenuItem,
+	ContextMenuLabel,
+	ContextMenuSeparator,
+	ContextMenuTrigger,
+} from "@/components/ui/context-menu";
 import { cn } from "@/lib/utils";
 import { appRouter } from "@/server/api/root";
 import { api } from "@/utils/api";
@@ -286,17 +294,17 @@ const EnvironmentPage = (
 	const utils = api.useUtils();
 	const [isBulkActionLoading, setIsBulkActionLoading] = useState(false);
 	const { projectId, environmentId } = props;
-	const { data: auth } = api.user.get.useQuery();
+	// const { data: auth } = api.user.get.useQuery();
 	const { data: permissions } = api.user.getPermissions.useQuery();
 
 	const { data: environments } = api.environment.byProjectId.useQuery({
 		projectId: projectId,
 	});
-	const environmentDropdownItems =
-		environments?.map((env) => ({
-			name: env.name,
-			href: `/dashboard/project/${projectId}/environment/${env.environmentId}`,
-		})) || [];
+	// const environmentDropdownItems =
+	// 	environments?.map((env) => ({
+	// 		name: env.name,
+	// 		href: `/dashboard/project/${projectId}/environment/${env.environmentId}`,
+	// 	})) || [];
 
 	const [sortBy, setSortBy] = useState<string>(() => {
 		if (typeof window !== "undefined") {
@@ -421,7 +429,11 @@ const EnvironmentPage = (
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 	const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
 	const [deleteVolumes, setDeleteVolumes] = useState(false);
+	const [singleDeleteVolumes, setSingleDeleteVolumes] = useState(false);
 	const [selectedServerId, setSelectedServerId] = useState<string>("all");
+	const [serviceActionLoading, setServiceActionLoading] = useState<
+		Record<string, string>
+	>({});
 
 	const handleSelectAll = () => {
 		if (selectedServices.length === filteredServices.length) {
@@ -497,6 +509,190 @@ const EnvironmentPage = (
 		deploy: api.mongo.deploy.useMutation(),
 	};
 
+	const setServiceActionState = (
+		serviceId: string,
+		action: string | null,
+	) => {
+		setServiceActionLoading((prev) => {
+			if (!action) {
+				const { [serviceId]: _, ...rest } = prev;
+				return rest;
+			}
+			return {
+				...prev,
+				[serviceId]: action,
+			};
+		});
+	};
+
+	const performServiceStart = async (service: Services) => {
+		switch (service.type) {
+			case "application":
+				await applicationActions.start.mutateAsync({
+					applicationId: service.id,
+				});
+				return;
+			case "compose":
+				await composeActions.start.mutateAsync({ composeId: service.id });
+				return;
+			case "postgres":
+				await postgresActions.start.mutateAsync({ postgresId: service.id });
+				return;
+			case "mysql":
+				await mysqlActions.start.mutateAsync({ mysqlId: service.id });
+				return;
+			case "mariadb":
+				await mariadbActions.start.mutateAsync({ mariadbId: service.id });
+				return;
+			case "redis":
+				await redisActions.start.mutateAsync({ redisId: service.id });
+				return;
+			case "mongo":
+				await mongoActions.start.mutateAsync({ mongoId: service.id });
+				return;
+			case "libsql":
+				return;
+		}
+	};
+
+	const performServiceStop = async (service: Services) => {
+		switch (service.type) {
+			case "application":
+				await applicationActions.stop.mutateAsync({
+					applicationId: service.id,
+				});
+				return;
+			case "compose":
+				await composeActions.stop.mutateAsync({ composeId: service.id });
+				return;
+			case "postgres":
+				await postgresActions.stop.mutateAsync({ postgresId: service.id });
+				return;
+			case "mysql":
+				await mysqlActions.stop.mutateAsync({ mysqlId: service.id });
+				return;
+			case "mariadb":
+				await mariadbActions.stop.mutateAsync({ mariadbId: service.id });
+				return;
+			case "redis":
+				await redisActions.stop.mutateAsync({ redisId: service.id });
+				return;
+			case "mongo":
+				await mongoActions.stop.mutateAsync({ mongoId: service.id });
+				return;
+			case "libsql":
+				return;
+		}
+	};
+
+	const performServiceDeploy = async (service: Services) => {
+		switch (service.type) {
+			case "application":
+				await applicationActions.deploy.mutateAsync({
+					applicationId: service.id,
+				});
+				return;
+			case "compose":
+				await composeActions.deploy.mutateAsync({ composeId: service.id });
+				return;
+			case "postgres":
+				await postgresActions.deploy.mutateAsync({ postgresId: service.id });
+				return;
+			case "mysql":
+				await mysqlActions.deploy.mutateAsync({ mysqlId: service.id });
+				return;
+			case "mariadb":
+				await mariadbActions.deploy.mutateAsync({ mariadbId: service.id });
+				return;
+			case "redis":
+				await redisActions.deploy.mutateAsync({ redisId: service.id });
+				return;
+			case "mongo":
+				await mongoActions.deploy.mutateAsync({ mongoId: service.id });
+				return;
+			case "libsql":
+				return;
+		}
+	};
+
+	const performServiceDelete = async (
+		service: Services,
+		deleteVolumes = false,
+	) => {
+		switch (service.type) {
+			case "application":
+				await applicationActions.delete.mutateAsync({
+					applicationId: service.id,
+				});
+				return;
+			case "compose":
+				await composeActions.delete.mutateAsync({
+					composeId: service.id,
+					deleteVolumes,
+				});
+				return;
+			case "postgres":
+				await postgresActions.delete.mutateAsync({ postgresId: service.id });
+				return;
+			case "mysql":
+				await mysqlActions.delete.mutateAsync({ mysqlId: service.id });
+				return;
+			case "mariadb":
+				await mariadbActions.delete.mutateAsync({ mariadbId: service.id });
+				return;
+			case "redis":
+				await redisActions.delete.mutateAsync({ redisId: service.id });
+				return;
+			case "mongo":
+				await mongoActions.delete.mutateAsync({ mongoId: service.id });
+				return;
+			case "libsql":
+				return;
+		}
+	};
+
+	const handleSingleServiceAction = async (
+		service: Services,
+		action: "start" | "stop" | "deploy" | "delete",
+		options?: { deleteVolumes?: boolean },
+	) => {
+		try {
+			setServiceActionState(service.id, action);
+			switch (action) {
+				case "start":
+					await performServiceStart(service);
+					toast.success(`${service.name} started successfully`);
+					break;
+				case "stop":
+					await performServiceStop(service);
+					toast.success(`${service.name} stopped successfully`);
+					break;
+				case "deploy":
+					await performServiceDeploy(service);
+					toast.success(`${service.name} queued for deployment`);
+					break;
+				case "delete":
+					await performServiceDelete(service, options?.deleteVolumes);
+					toast.success(`${service.name} deleted successfully`);
+					break;
+			}
+			await utils.environment.one.invalidate({ environmentId });
+			refetch();
+		} catch (error) {
+			const actionLabel =
+				action === "deploy"
+					? "deploying"
+					: action === "delete"
+						? "deleting"
+						: `${action}${action === "stop" ? "ping" : "ing"}`;
+			toast.error(
+				`Error ${actionLabel} ${service.name}${error instanceof Error && error.message ? `: ${error.message}` : ""}`,
+			);
+		} finally {
+			setServiceActionState(service.id, null);
+		}
+	};
+
 	const handleBulkStart = async () => {
 		let success = 0;
 		setIsBulkActionLoading(true);
@@ -504,32 +700,7 @@ const EnvironmentPage = (
 			try {
 				const service = filteredServices.find((s) => s.id === serviceId);
 				if (!service) continue;
-
-				switch (service.type) {
-					case "application":
-						await applicationActions.start.mutateAsync({
-							applicationId: serviceId,
-						});
-						break;
-					case "compose":
-						await composeActions.start.mutateAsync({ composeId: serviceId });
-						break;
-					case "postgres":
-						await postgresActions.start.mutateAsync({ postgresId: serviceId });
-						break;
-					case "mysql":
-						await mysqlActions.start.mutateAsync({ mysqlId: serviceId });
-						break;
-					case "mariadb":
-						await mariadbActions.start.mutateAsync({ mariadbId: serviceId });
-						break;
-					case "redis":
-						await redisActions.start.mutateAsync({ redisId: serviceId });
-						break;
-					case "mongo":
-						await mongoActions.start.mutateAsync({ mongoId: serviceId });
-						break;
-				}
+				await performServiceStart(service);
 				success++;
 			} catch {
 				toast.error(`Error starting service ${serviceId}`);
@@ -551,32 +722,7 @@ const EnvironmentPage = (
 			try {
 				const service = filteredServices.find((s) => s.id === serviceId);
 				if (!service) continue;
-
-				switch (service.type) {
-					case "application":
-						await applicationActions.stop.mutateAsync({
-							applicationId: serviceId,
-						});
-						break;
-					case "compose":
-						await composeActions.stop.mutateAsync({ composeId: serviceId });
-						break;
-					case "postgres":
-						await postgresActions.stop.mutateAsync({ postgresId: serviceId });
-						break;
-					case "mysql":
-						await mysqlActions.stop.mutateAsync({ mysqlId: serviceId });
-						break;
-					case "mariadb":
-						await mariadbActions.stop.mutateAsync({ mariadbId: serviceId });
-						break;
-					case "redis":
-						await redisActions.stop.mutateAsync({ redisId: serviceId });
-						break;
-					case "mongo":
-						await mongoActions.stop.mutateAsync({ mongoId: serviceId });
-						break;
-				}
+				await performServiceStop(service);
 				success++;
 			} catch {
 				toast.error(`Error stopping service ${serviceId}`);
@@ -683,45 +829,7 @@ const EnvironmentPage = (
 			try {
 				const service = filteredServices.find((s) => s.id === serviceId);
 				if (!service) continue;
-
-				switch (service.type) {
-					case "application":
-						await applicationActions.delete.mutateAsync({
-							applicationId: serviceId,
-						});
-						break;
-					case "compose":
-						await composeActions.delete.mutateAsync({
-							composeId: serviceId,
-							deleteVolumes,
-						});
-						break;
-					case "postgres":
-						await postgresActions.delete.mutateAsync({
-							postgresId: serviceId,
-						});
-						break;
-					case "mysql":
-						await mysqlActions.delete.mutateAsync({
-							mysqlId: serviceId,
-						});
-						break;
-					case "mariadb":
-						await mariadbActions.delete.mutateAsync({
-							mariadbId: serviceId,
-						});
-						break;
-					case "redis":
-						await redisActions.delete.mutateAsync({
-							redisId: serviceId,
-						});
-						break;
-					case "mongo":
-						await mongoActions.delete.mutateAsync({
-							mongoId: serviceId,
-						});
-						break;
-				}
+				await performServiceDelete(service, deleteVolumes);
 				await utils.environment.one.invalidate({
 					environmentId,
 				});
@@ -750,44 +858,7 @@ const EnvironmentPage = (
 			try {
 				const service = filteredServices.find((s) => s.id === serviceId);
 				if (!service) continue;
-
-				switch (service.type) {
-					case "application":
-						await applicationActions.deploy.mutateAsync({
-							applicationId: serviceId,
-						});
-						break;
-					case "compose":
-						await composeActions.deploy.mutateAsync({
-							composeId: serviceId,
-						});
-						break;
-					case "postgres":
-						await postgresActions.deploy.mutateAsync({
-							postgresId: serviceId,
-						});
-						break;
-					case "mysql":
-						await mysqlActions.deploy.mutateAsync({
-							mysqlId: serviceId,
-						});
-						break;
-					case "mariadb":
-						await mariadbActions.deploy.mutateAsync({
-							mariadbId: serviceId,
-						});
-						break;
-					case "redis":
-						await redisActions.deploy.mutateAsync({
-							redisId: serviceId,
-						});
-						break;
-					case "mongo":
-						await mongoActions.deploy.mutateAsync({
-							mongoId: serviceId,
-						});
-						break;
-				}
+				await performServiceDeploy(service);
 				success++;
 			} catch (error) {
 				failed++;
@@ -857,6 +928,8 @@ const EnvironmentPage = (
 		);
 	}, [filteredServices, selectedServices]);
 
+	const hasServiceActions = (service: Services) => service.type !== "libsql";
+
 	if (isLoading) {
 		return (
 			<div className="flex flex-row gap-2 items-center justify-center text-sm text-muted-foreground min-h-[60vh]">
@@ -881,12 +954,11 @@ const EnvironmentPage = (
 			<AdvanceBreadcrumb />
 			<Head>
 				<title>
-					Environment: {currentEnvironment.name} | {projectData?.name} |{" "}
-					{appName}
+					{currentEnvironment.name} | {projectData?.name} | {appName}
 				</title>
 			</Head>
 			<div className="w-full">
-				<Card className="h-full bg-sidebar p-2.5 rounded-xl">
+				<Card className="h-full bg-sidebar border-0 rounded-xl -mx-4 -mt-8">
 					<div className="rounded-xl bg-background shadow-md">
 						<div className="flex justify-between gap-4 w-full items-center flex-wrap p-6">
 							<CardHeader className="p-0">
@@ -1470,12 +1542,13 @@ const EnvironmentPage = (
 										<div className="flex w-full flex-col gap-4">
 											<div className="gap-5 pb-10 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
 												{filteredServices?.map((service) => (
-													<Link
-														key={service.id}
-														href={`/dashboard/project/${projectId}/environment/${environmentId}/services/${service.type}/${service.id}`}
-														className="block"
-													>
-														<Card className="flex flex-col group relative cursor-pointer bg-transparent transition-colors hover:bg-border">
+													<ContextMenu key={service.id}>
+														<ContextMenuTrigger asChild>
+															<Link
+																href={`/dashboard/project/${projectId}/environment/${environmentId}/services/${service.type}/${service.id}`}
+																className="block"
+															>
+																<Card className="flex flex-col group relative cursor-pointer bg-transparent transition-colors hover:bg-border">
 															{service.serverId && (
 																<div className="absolute -left-1 -top-2">
 																	<ServerIcon className="size-4 text-muted-foreground" />
@@ -1562,10 +1635,166 @@ const EnvironmentPage = (
 																	<DateTooltip date={service.createdAt}>
 																		Created
 																	</DateTooltip>
-																</div>
-															</CardFooter>
-														</Card>
-													</Link>
+																	</div>
+																</CardFooter>
+																</Card>
+															</Link>
+														</ContextMenuTrigger>
+														{hasServiceActions(service) && (
+															<ContextMenuContent>
+																<ContextMenuLabel>{service.name}</ContextMenuLabel>
+																<ContextMenuSeparator />
+																<DialogAction
+																	title={`Start ${service.name}`}
+																	description={`Are you sure you want to start ${service.name}?`}
+																	type="default"
+																	onClick={() =>
+																		handleSingleServiceAction(service, "start")
+																	}
+																>
+																	<ContextMenuItem inset>
+																		<CheckCircle2 className="mr-2 h-4 w-4" />
+																		Start
+																	</ContextMenuItem>
+																</DialogAction>
+																<DialogAction
+																	title={`Deploy ${service.name}`}
+																	description={`Are you sure you want to deploy ${service.name}? This will redeploy/restart the service.`}
+																	type="default"
+																	onClick={() =>
+																		handleSingleServiceAction(service, "deploy")
+																	}
+																>
+																	<ContextMenuItem inset>
+																		<Play className="mr-2 h-4 w-4" />
+																		Deploy
+																	</ContextMenuItem>
+																</DialogAction>
+																<DialogAction
+																	title={`Stop ${service.name}`}
+																	description={`Are you sure you want to stop ${service.name}?`}
+																	type="destructive"
+																	onClick={() =>
+																		handleSingleServiceAction(service, "stop")
+																	}
+																>
+																	<ContextMenuItem
+																		inset
+																		className="text-destructive focus:text-destructive"
+																	>
+																		<Ban className="mr-2 h-4 w-4" />
+																		Stop
+																	</ContextMenuItem>
+																</DialogAction>
+																{permissions?.service.delete && (
+																	<>
+																		<ContextMenuSeparator />
+																		{service.type === "compose" ? (
+																			<Dialog
+																				onOpenChange={(open) => {
+																					if (!open) {
+																						setSingleDeleteVolumes(false);
+																					}
+																				}}
+																			>
+																				<DialogTrigger asChild>
+																					<ContextMenuItem
+																						inset
+																						className="text-destructive focus:text-destructive"
+																					>
+																						<Trash2 className="mr-2 h-4 w-4" />
+																						Delete
+																					</ContextMenuItem>
+																				</DialogTrigger>
+																				<DialogContent>
+																					<DialogHeader>
+																						<DialogTitle>
+																							Delete {service.name}
+																						</DialogTitle>
+																						<DialogDescription>
+																							Are you sure you want to delete{" "}
+																							{service.name}? This action cannot be
+																							undone.
+																						</DialogDescription>
+																					</DialogHeader>
+																					<div className="space-y-4">
+																						<div className="flex items-center space-x-2">
+																							<Checkbox
+																								id={`delete-volumes-${service.id}`}
+																								checked={singleDeleteVolumes}
+																								onCheckedChange={(checked) =>
+																									setSingleDeleteVolumes(
+																										checked === true,
+																									)
+																								}
+																							/>
+																							<label
+																								htmlFor={`delete-volumes-${service.id}`}
+																								className="text-sm font-medium"
+																							>
+																								Delete volumes associated with this
+																								service
+																							</label>
+																						</div>
+																					</div>
+																					<DialogFooter>
+																						<Button
+																							variant="outline"
+																							onClick={() =>
+																								setSingleDeleteVolumes(false)
+																							}
+																						>
+																							Cancel
+																						</Button>
+																						<Button
+																							variant="destructive"
+																							isLoading={
+																								serviceActionLoading[service.id] ===
+																								"delete"
+																							}
+																							onClick={async () => {
+																								await handleSingleServiceAction(
+																									service,
+																									"delete",
+																									{
+																										deleteVolumes:
+																											singleDeleteVolumes,
+																									},
+																								);
+																								setSingleDeleteVolumes(false);
+																							}}
+																						>
+																							Delete Service
+																						</Button>
+																					</DialogFooter>
+																				</DialogContent>
+																			</Dialog>
+																		) : (
+																			<DialogAction
+																				title={`Delete ${service.name}`}
+																				description={`Are you sure you want to delete ${service.name}? This action cannot be undone.`}
+																				type="destructive"
+																				onClick={() =>
+																					handleSingleServiceAction(
+																						service,
+																						"delete",
+																					)
+																				}
+																			>
+																				<ContextMenuItem
+																					inset
+																					className="text-destructive focus:text-destructive"
+																				>
+																					<Trash2 className="mr-2 h-4 w-4" />
+																					Delete
+																				</ContextMenuItem>
+																			</DialogAction>
+																		)}
+																	</>
+																)}
+															</ContextMenuContent>
+														)}
+													</ContextMenu>
 												))}
 											</div>
 										</div>

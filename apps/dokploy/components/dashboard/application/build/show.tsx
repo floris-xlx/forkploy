@@ -31,6 +31,16 @@ import { api } from "@/utils/api";
 
 // Railpack versions from https://github.com/railwayapp/railpack/releases
 export const RAILPACK_VERSIONS = [
+	"0.23.0",
+	"0.22.2",
+	"0.22.1",
+	"0.22.0",
+	"0.21.0",
+	"0.20.0",
+	"0.19.0",
+	"0.18.0",
+	"0.17.2",
+	"0.17.1",
 	"0.15.4",
 	"0.15.3",
 	"0.15.2",
@@ -91,7 +101,7 @@ const mySchema = z.discriminatedUnion("buildType", [
 	}),
 	z.object({
 		buildType: z.literal(BuildType.railpack),
-		railpackVersion: z.string().nullable().default("0.15.4"),
+		railpackVersion: z.string().nullable().default("0.23.0"),
 	}),
 	z.object({
 		buildType: z.literal(BuildType.static),
@@ -227,7 +237,7 @@ export const ShowBuildChooseForm = ({ applicationId }: Props) => {
 				data.buildType === BuildType.static ? data.isStaticSpa : null,
 			railpackVersion:
 				data.buildType === BuildType.railpack
-					? data.railpackVersion || "0.15.4"
+					? data.railpackVersion || "0.23.0"
 					: null,
 		})
 			.then(async () => {
@@ -302,6 +312,16 @@ export const ShowBuildChooseForm = ({ applicationId }: Props) => {
 															{label}
 															{value === BuildType.railpack && (
 																<Badge className="ml-2 px-1 text-xs">New</Badge>
+															)}
+															{(value === BuildType.nixpacks ||
+																value === BuildType.heroku_buildpacks ||
+																value === BuildType.paketo_buildpacks) && (
+																<Badge
+																	variant="yellow"
+																	className="ml-2 px-1 text-xs"
+																>
+																	Outdated, use railpack
+																</Badge>
 															)}
 														</FormLabel>
 													</FormItem>
@@ -455,7 +475,7 @@ export const ShowBuildChooseForm = ({ applicationId }: Props) => {
 												{isManualRailpackVersion ? (
 													<div className="space-y-2">
 														<Input
-															placeholder="Enter custom version (e.g., 0.15.4)"
+															placeholder="Enter custom version (e.g., 0.23.0)"
 															{...field}
 															value={field.value ?? ""}
 														/>
@@ -465,7 +485,7 @@ export const ShowBuildChooseForm = ({ applicationId }: Props) => {
 															size="sm"
 															onClick={() => {
 																setIsManualRailpackVersion(false);
-																field.onChange("0.15.4");
+																field.onChange("0.23.0");
 															}}
 														>
 															Use predefined versions
@@ -481,7 +501,7 @@ export const ShowBuildChooseForm = ({ applicationId }: Props) => {
 																field.onChange(value);
 															}
 														}}
-														value={field.value ?? "0.15.4"}
+														value={field.value ?? "0.23.0"}
 													>
 														<SelectTrigger>
 															<SelectValue placeholder="Select Railpack version" />
@@ -495,7 +515,7 @@ export const ShowBuildChooseForm = ({ applicationId }: Props) => {
 															{RAILPACK_VERSIONS.map((version) => (
 																<SelectItem key={version} value={version}>
 																	v{version}
-																	{version === "0.15.4" && (
+																	{version === "0.23.0" && (
 																		<Badge
 																			variant="secondary"
 																			className="ml-2 px-1 text-xs"

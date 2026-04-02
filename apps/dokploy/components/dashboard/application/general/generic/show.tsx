@@ -131,7 +131,7 @@ export const ShowProviderForm = ({ applicationId }: Props) => {
 	}
 
 	return (
-		<Card className="group relative w-full bg-transparent">
+		<Card className="group relative w-full overflow-auto bg-transparent">
 			<CardHeader>
 				<CardTitle className="flex items-start justify-between">
 					<div className="flex flex-col gap-2">
@@ -153,21 +153,21 @@ export const ShowProviderForm = ({ applicationId }: Props) => {
 						setSab(e as TabState);
 					}}
 				>
-					<div className="flex flex-row items-center justify-between w-full overflow-auto">
-						<TabsList className="flex gap-4 justify-start bg-transparent">
+					<div className="relative -left-6 flex w-fit flex-row items-center justify-between overflow-auto rounded-r-xl border border-l-0 bg-popover">
+						<TabsList className="ml-6 flex justify-start gap-4 bg-transparent">
 							<TabsTrigger
 								value="github"
 								className="rounded-none border-b-2 gap-2 border-b-transparent data-[state=active]:border-b-2 data-[state=active]:border-b-border"
 							>
 								<GithubIcon className="size-4 text-current fill-current" />
-								Github
+								GitHub
 							</TabsTrigger>
 							<TabsTrigger
 								value="gitlab"
 								className="rounded-none border-b-2 gap-2 border-b-transparent data-[state=active]:border-b-2 data-[state=active]:border-b-border"
 							>
 								<GitlabIcon className="size-4 text-current fill-current" />
-								Gitlab
+								GitLab
 							</TabsTrigger>
 							<TabsTrigger
 								value="bitbucket"
