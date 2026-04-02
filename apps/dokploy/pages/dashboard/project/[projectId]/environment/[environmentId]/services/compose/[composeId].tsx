@@ -94,7 +94,7 @@ const Service = (
 		})) || [];
 
 	return (
-		<div className="pb-10">
+		<div className="">
 			<UseKeyboardNav forPage="compose" />
 			<AdvanceBreadcrumb />
 			<Head>
@@ -103,10 +103,10 @@ const Service = (
 				</title>
 			</Head>
 			<div className="w-full">
-				<Card className="h-full bg-sidebar p-2.5 rounded-xl w-full">
-					<div className="rounded-xl bg-background shadow-md ">
-						<div className="flex flex-col gap-4">
-							<CardHeader className="flex flex-row justify-between items-center">
+				<Card className="h-full bg-sidebar border-none rounded-xl w-full -mx-4 -mt-8">
+					<div className="rounded-xl bg-background shadow-md w-full">
+						<div className="flex flex-col gap-4 border-b w-[calc(100svw-18.5rem)]">
+							<CardHeader className="flex p-2 flex-row justify-between items-center mx-4">
 								<div className="flex flex-col">
 									<CardTitle className="text-xl flex flex-row gap-2">
 										<div className="relative flex flex-row gap-4">
@@ -181,7 +181,7 @@ const Service = (
 								</div>
 							</CardHeader>
 						</div>
-						<CardContent className="space-y-2 py-8 border-t">
+						<CardContent className="space-y-2 py-8">
 							{data?.server?.serverStatus === "inactive" ? (
 								<div className="flex h-[55vh] border-2 rounded-xl border-dashed p-4">
 									<div className="max-w-3xl mx-auto flex flex-col items-center justify-center self-center gap-3">
