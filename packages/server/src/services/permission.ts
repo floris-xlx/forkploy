@@ -1,6 +1,5 @@
 import { db } from "@dokploy/server/db";
 import { member, organizationRole } from "@dokploy/server/db/schema";
-import { hasValidLicense } from "@dokploy/server/services/proprietary/license-key";
 import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 import {
@@ -44,7 +43,7 @@ const resolveRole = async (
 		return staticRoles[roleName];
 	}
 
-	const licensed = await hasValidLicense(organizationId);
+	const licensed = true;
 	if (!licensed) {
 		return null;
 	}

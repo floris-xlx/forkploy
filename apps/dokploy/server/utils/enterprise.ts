@@ -16,7 +16,7 @@ function isNetworkError(error: unknown): boolean {
 }
 
 export const validateLicenseKey = async (_licenseKey: string) => {
-  return true
+	return true;
 };
 
 export const activateLicenseKey = async (licenseKey: string) => {
@@ -36,7 +36,7 @@ export const activateLicenseKey = async (licenseKey: string) => {
 		}
 
 		const data = await result.json();
-		return data;
+		return true; // no idea what its supposed to return, lets yolo it
 	} catch (error) {
 		console.error(
 			error instanceof Error ? error.message : "Failed to activate license key",

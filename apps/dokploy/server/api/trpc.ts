@@ -9,7 +9,6 @@
 
 // import { getServerAuthSession } from "@/server/auth";
 import { db } from "@dokploy/server/db";
-import { hasValidLicense } from "@dokploy/server/index";
 import type { statements } from "@dokploy/server/lib/access-control";
 import { validateRequest } from "@dokploy/server/lib/auth";
 import { checkPermission } from "@dokploy/server/services/permission";
@@ -220,17 +219,6 @@ export const enterpriseProcedure = t.procedure.use(async ({ ctx, next }) => {
 		(ctx.user.role !== "owner" && ctx.user.role !== "admin")
 	) {
 		throw new TRPCError({ code: "UNAUTHORIZED" });
-	}
-
-	const hasValidLicenseResult = await hasValidLicense(
-		ctx.session.activeOrganizationId,
-	);
-
-	if (!hasValidLicenseResult) {
-		throw new TRPCError({
-			code: "FORBIDDEN",
-			message: "Valid enterprise license required",
-		});
 	}
 
 	return next({

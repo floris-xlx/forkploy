@@ -1,6 +1,7 @@
 import {
 	getWebServerSettings,
 	IS_CLOUD,
+	runEnterpriseCheck,
 	setupWebMonitoring,
 	updateWebServerSettings,
 } from "@dokploy/server";
@@ -9,6 +10,28 @@ import { apiUpdateWebServerMonitoring } from "@/server/db/schema";
 import { adminProcedure, createTRPCRouter } from "../trpc";
 
 export const adminRouter = createTRPCRouter({
+	runEnterpriseCheck: adminProcedure.mutation(async ({ ctx }) => {
+		try {
+			if (ctx.user.role !== "owner") {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "You are not authorized to run the enterprise check",
+				});
+			}
+
+			await runEnterpriseCheck();
+
+			return { success: true };
+		} catch (error) {
+			throw new TRPCError({
+				code: "INTERNAL_SERVER_ERROR",
+				message:
+					error instanceof Error
+						? error.message
+						: "Failed to run enterprise check",
+			});
+		}
+	}),
 	setupMonitoring: adminProcedure
 		.input(apiUpdateWebServerMonitoring)
 		.mutation(async ({ input }) => {

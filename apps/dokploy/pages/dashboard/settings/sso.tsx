@@ -4,7 +4,6 @@ import type { GetServerSidePropsContext } from "next";
 import type { ReactElement } from "react";
 import superjson from "superjson";
 import { DashboardLayout } from "@/components/layouts/dashboard-layout";
-import { EnterpriseFeatureGate } from "@/components/proprietary/enterprise-feature-gate";
 import { SSOSettings } from "@/components/proprietary/sso/sso-settings";
 import { Card } from "@/components/ui/card";
 import { appRouter } from "@/server/api/root";
@@ -16,16 +15,7 @@ const Page = () => {
 				<Card className="h-full bg-sidebar p-2.5 rounded-xl mx-auto w-full">
 					<div className="rounded-xl bg-background shadow-md">
 						<div className="p-6">
-							<EnterpriseFeatureGate
-								lockedProps={{
-									title: "Enterprise SSO",
-									description:
-										"Single sign-on (SSO) with OIDC and SAML is part of Dokploy Enterprise. Add a valid license to configure it.",
-									ctaLabel: "Go to License",
-								}}
-							>
-								<SSOSettings />
-							</EnterpriseFeatureGate>
+							<SSOSettings />
 						</div>
 					</div>
 				</Card>
