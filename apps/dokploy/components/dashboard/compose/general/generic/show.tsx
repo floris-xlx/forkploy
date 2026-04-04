@@ -159,8 +159,8 @@ export const ShowProviderFormCompose = ({ composeId }: Props) => {
 						setSab(e as TabState);
 					}}
 				>
-					<div className="flex flex-row items-center justify-between w-fit overflow-auto bg-popover relative border -left-6 border-l-0 rounded-r-xl">
-						<TabsList className="flex gap-4 justify-start ml-6 bg-transparent">
+					<div className="flex flex-row items-center justify-between w-fit overflow-auto">
+						<TabsList className="flex gap-4 justify-start bg-transparent">
 							<TabsTrigger
 								value="github"
 								className="rounded-none border-b-2 gap-2 border-b-transparent data-[state=active]:border-b-2 data-[state=active]:border-b-border"

@@ -30,8 +30,8 @@ import { ShowDockerLogsStack } from "@/components/dashboard/compose/logs/show-st
 import { UpdateCompose } from "@/components/dashboard/compose/update-compose";
 import { ShowBackups } from "@/components/dashboard/database/backups/show-backups";
 import { ComposePaidMonitoring } from "@/components/dashboard/monitoring/paid/container/show-paid-compose-monitoring";
-import { DashboardLayout } from "@/components/layouts/dashboard-layout";
 import { MigrateService } from "@/components/dashboard/shared/migrate-service";
+import { DashboardLayout } from "@/components/layouts/dashboard-layout";
 import { AdvanceBreadcrumb } from "@/components/shared/advance-breadcrumb";
 import { StatusTooltip } from "@/components/shared/status-tooltip";
 import { Badge } from "@/components/ui/badge";
@@ -86,9 +86,7 @@ const Service = (
 
 	const { data, refetch } = api.compose.one.useQuery({ composeId });
 
-	const { data: auth } = api.user.get.useQuery();
 	const { data: permissions } = api.user.getPermissions.useQuery();
-	const { data: isCloud } = api.settings.isCloud.useQuery();
 	const { data: environments } = api.environment.byProjectId.useQuery({
 		projectId: data?.environment?.projectId || "",
 	});
@@ -133,7 +131,7 @@ const Service = (
 										{data?.appName}
 									</span>
 								</div>
-								<div className="flex flex-col h-fit w-fit gap-2">
+								<div className="flex flex-col h-fit w-fit gap-2 mr-10">
 									<div className="flex flex-row h-fit w-fit gap-2">
 										<Badge
 											className="cursor-pointer"
@@ -151,7 +149,8 @@ const Service = (
 														: "destructive"
 											}
 										>
-											{data?.server?.name || "Dokploy Server"}
+											{data?.server?.name ||
+												"Dokploy Server (please dont use this)"}
 										</Badge>
 										{data?.server?.serverStatus === "inactive" && (
 											<TooltipProvider>
@@ -208,15 +207,15 @@ const Service = (
 									</div>
 								</div>
 							) : (
-							<Tabs
-								value={tab}
-								className="w-full"
-								onValueChange={(e) => {
-									setTab(e as TabState);
-									const newPath = `/dashboard/project/${projectId}/environment/${environmentId}/services/compose/${composeId}?tab=${e}`;
-									router.push(newPath);
-								}}
-							>
+								<Tabs
+									value={tab}
+									className="w-full"
+									onValueChange={(e) => {
+										setTab(e as TabState);
+										const newPath = `/dashboard/project/${projectId}/environment/${environmentId}/services/compose/${composeId}?tab=${e}`;
+										router.push(newPath);
+									}}
+								>
 									<div className="flex items-center w-full overflow-auto">
 										<TabsList className="flex gap-7 max-md:gap-4 justify-start">
 											<TabsTrigger value="general">General</TabsTrigger>
@@ -234,9 +233,7 @@ const Service = (
 												</TabsTrigger>
 											)}
 											{permissions?.docker.read && (
-												<TabsTrigger value="containers">
-													Containers
-												</TabsTrigger>
+												<TabsTrigger value="containers">Containers</TabsTrigger>
 											)}
 											{permissions?.service.create && (
 												<TabsTrigger value="backups">Backups</TabsTrigger>
@@ -256,7 +253,7 @@ const Service = (
 												<TabsTrigger value="patches">Patches</TabsTrigger>
 											)}
 											{permissions?.monitoring.read &&
-												((data?.serverId) || !data?.server) && (
+												(data?.serverId || !data?.server) && (
 													<TabsTrigger value="monitoring">
 														Monitoring
 													</TabsTrigger>
