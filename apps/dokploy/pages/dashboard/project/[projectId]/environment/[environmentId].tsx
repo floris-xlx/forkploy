@@ -430,6 +430,8 @@ const EnvironmentPage = (
 	const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
 	const [deleteVolumes, setDeleteVolumes] = useState(false);
 	const [singleDeleteVolumes, setSingleDeleteVolumes] = useState(false);
+	const [composeDeleteDialogServiceId, setComposeDeleteDialogServiceId] =
+		useState<string | null>(null);
 	const [selectedServerId, setSelectedServerId] = useState<string>("all");
 	const [serviceActionLoading, setServiceActionLoading] = useState<
 		Record<string, string>
@@ -1691,21 +1693,31 @@ const EnvironmentPage = (
 																		<ContextMenuSeparator />
 																		{service.type === "compose" ? (
 																			<Dialog
+																				open={
+																					composeDeleteDialogServiceId === service.id
+																				}
 																				onOpenChange={(open) => {
+																					setComposeDeleteDialogServiceId(
+																						open ? service.id : null,
+																					);
 																					if (!open) {
 																						setSingleDeleteVolumes(false);
 																					}
 																				}}
 																			>
-																				<DialogTrigger asChild>
-																					<ContextMenuItem
-																						inset
-																						className="text-destructive focus:text-destructive"
-																					>
-																						<Trash2 className="mr-2 h-4 w-4" />
-																						Delete
-																					</ContextMenuItem>
-																				</DialogTrigger>
+																				<ContextMenuItem
+																					inset
+																					className="text-destructive focus:text-destructive"
+																					onSelect={(e) => {
+																						e.preventDefault();
+																						setComposeDeleteDialogServiceId(
+																							service.id,
+																						);
+																					}}
+																				>
+																					<Trash2 className="mr-2 h-4 w-4" />
+																					Delete
+																				</ContextMenuItem>
 																				<DialogContent>
 																					<DialogHeader>
 																						<DialogTitle>
@@ -1737,15 +1749,18 @@ const EnvironmentPage = (
 																							</label>
 																						</div>
 																					</div>
-																					<DialogFooter>
-																						<Button
-																							variant="outline"
-																							onClick={() =>
-																								setSingleDeleteVolumes(false)
-																							}
-																						>
-																							Cancel
-																						</Button>
+																						<DialogFooter>
+																							<Button
+																								variant="outline"
+																								onClick={() => {
+																									setComposeDeleteDialogServiceId(
+																										null,
+																									);
+																									setSingleDeleteVolumes(false);
+																								}}
+																							>
+																								Cancel
+																							</Button>
 																						<Button
 																							variant="destructive"
 																							isLoading={
@@ -1760,6 +1775,9 @@ const EnvironmentPage = (
 																										deleteVolumes:
 																											singleDeleteVolumes,
 																									},
+																								);
+																								setComposeDeleteDialogServiceId(
+																									null,
 																								);
 																								setSingleDeleteVolumes(false);
 																							}}

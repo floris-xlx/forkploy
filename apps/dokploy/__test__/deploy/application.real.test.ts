@@ -1,3 +1,4 @@
+import { execSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import type { ApplicationNested } from "@dokploy/server";
@@ -7,6 +8,22 @@ import { format } from "date-fns";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const REAL_TEST_TIMEOUT = 180000; // 3 minutes
+const shouldRunRealTests =
+	process.env.RUN_REAL_DEPLOY_TESTS === "1" &&
+	commandExists("docker") &&
+	commandExists("git") &&
+	commandExists("nixpacks");
+
+function commandExists(command: string) {
+	try {
+		execSync(`command -v ${command}`, {
+			stdio: "ignore",
+		});
+		return true;
+	} catch {
+		return false;
+	}
+}
 
 // Mock ONLY database and notifications
 vi.mock("@dokploy/server/db", () => {
@@ -45,10 +62,10 @@ vi.mock("@dokploy/server/db", () => {
 	};
 });
 
-vi.mock("@dokploy/server/services/application", async () => {
-	const actual = await vi.importActual<
+vi.mock("@dokploy/server/services/application", async (importOriginal) => {
+	const actual = await importOriginal<
 		typeof import("@dokploy/server/services/application")
-	>("@dokploy/server/services/application");
+	>();
 	return {
 		...actual,
 		findApplicationById: vi.fn(),
@@ -171,7 +188,7 @@ async function cleanupFiles(appName: string) {
 	}
 }
 
-describe(
+describe.skipIf(!shouldRunRealTests)(
 	"deployApplication - REAL Execution Tests",
 	() => {
 		let currentAppName: string;

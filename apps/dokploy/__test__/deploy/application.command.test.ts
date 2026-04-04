@@ -44,10 +44,10 @@ vi.mock("@dokploy/server/db", () => {
 	};
 });
 
-vi.mock("@dokploy/server/services/application", async () => {
-	const actual = await vi.importActual<
+vi.mock("@dokploy/server/services/application", async (importOriginal) => {
+	const actual = await importOriginal<
 		typeof import("@dokploy/server/services/application")
-	>("@dokploy/server/services/application");
+	>();
 	return {
 		...actual,
 		findApplicationById: vi.fn(),
@@ -65,10 +65,10 @@ vi.mock("@dokploy/server/services/deployment", () => ({
 	updateDeployment: vi.fn(),
 }));
 
-vi.mock("@dokploy/server/utils/providers/git", async () => {
-	const actual = await vi.importActual<
+vi.mock("@dokploy/server/utils/providers/git", async (importOriginal) => {
+	const actual = await importOriginal<
 		typeof import("@dokploy/server/utils/providers/git")
-	>("@dokploy/server/utils/providers/git");
+	>();
 	return {
 		...actual,
 		getGitCommitInfo: vi.fn(),
@@ -80,10 +80,10 @@ vi.mock("@dokploy/server/utils/process/execAsync", () => ({
 	ExecError: class ExecError extends Error {},
 }));
 
-vi.mock("@dokploy/server/utils/builders", async () => {
-	const actual = await vi.importActual<
+vi.mock("@dokploy/server/utils/builders", async (importOriginal) => {
+	const actual = await importOriginal<
 		typeof import("@dokploy/server/utils/builders")
-	>("@dokploy/server/utils/builders");
+	>();
 	return {
 		...actual,
 		mechanizeDockerContainer: vi.fn(),

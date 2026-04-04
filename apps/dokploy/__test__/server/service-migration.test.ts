@@ -1,22 +1,8 @@
 import { TRPCError } from "@trpc/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const {
-	findApplicationByIdMock,
-	findServerByIdMock,
-	execAsyncMock,
-	execAsyncRemoteMock,
-	inspectMock,
-} = vi.hoisted(() => ({
-	findApplicationByIdMock: vi.fn(),
-	findServerByIdMock: vi.fn(),
-	execAsyncMock: vi.fn(),
-	execAsyncRemoteMock: vi.fn(),
-	inspectMock: vi.fn(),
-}));
-
 vi.mock("@dokploy/server/services/application", () => ({
-	findApplicationById: findApplicationByIdMock,
+	findApplicationById: vi.fn(),
 	updateApplication: vi.fn(),
 	deployApplication: vi.fn(),
 }));
@@ -64,22 +50,26 @@ vi.mock("@dokploy/server/services/libsql", () => ({
 }));
 
 vi.mock("@dokploy/server/services/server", () => ({
-	findServerById: findServerByIdMock,
+	findServerById: vi.fn(),
 }));
 
 vi.mock("@dokploy/server/utils/process/execAsync", () => ({
-	execAsync: execAsyncMock,
-	execAsyncRemote: execAsyncRemoteMock,
+	execAsync: vi.fn(),
+	execAsyncRemote: vi.fn(),
 }));
 
 vi.mock("@dokploy/server/utils/servers/remote-docker", () => ({
 	getRemoteDocker: vi.fn(async () => ({
 		getService: vi.fn(() => ({
-			inspect: inspectMock,
+			inspect: vi.fn(),
 		})),
 	})),
 }));
 
+import * as applicationService from "@dokploy/server/services/application";
+import * as serverService from "@dokploy/server/services/server";
+import * as execProcess from "@dokploy/server/utils/process/execAsync";
+import { getRemoteDocker } from "@dokploy/server/utils/servers/remote-docker";
 import {
 	buildMigrationLookup,
 	hasBindMounts,
@@ -129,13 +119,25 @@ const createServer = (serverId: string, overrides: Record<string, unknown> = {})
 describe("service migration preflight", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-		findApplicationByIdMock.mockResolvedValue(createApplication());
-		findServerByIdMock.mockImplementation(async (serverId: string) =>
+		vi.mocked(applicationService.findApplicationById).mockResolvedValue(
+			createApplication() as any,
+		);
+		vi.mocked(serverService.findServerById).mockImplementation(async (serverId: string) =>
 			createServer(serverId),
 		);
-		execAsyncMock.mockResolvedValue({ stdout: "", stderr: "" });
-		execAsyncRemoteMock.mockResolvedValue({ stdout: "", stderr: "" });
-		inspectMock.mockRejectedValue(new Error("not found"));
+		vi.mocked(execProcess.execAsync).mockResolvedValue({
+			stdout: "",
+			stderr: "",
+		} as any);
+		vi.mocked(execProcess.execAsyncRemote).mockResolvedValue({
+			stdout: "",
+			stderr: "",
+		} as any);
+		vi.mocked(getRemoteDocker).mockResolvedValue({
+			getService: vi.fn(() => ({
+				inspect: vi.fn().mockRejectedValue(new Error("not found")),
+			})),
+		} as any);
 	});
 
 	it("detects drop applications that need file and code sync", async () => {
@@ -152,10 +154,10 @@ describe("service migration preflight", () => {
 	});
 
 	it("supports dokploy server as the source endpoint", async () => {
-		findApplicationByIdMock.mockResolvedValue(
+		vi.mocked(applicationService.findApplicationById).mockResolvedValue(
 			createApplication({
 				serverId: null,
-			}),
+			}) as any,
 		);
 
 		const lookup = await buildMigrationLookup(
@@ -178,7 +180,7 @@ describe("service migration preflight", () => {
 	});
 
 	it("rejects services with bind mounts", async () => {
-		findApplicationByIdMock.mockResolvedValue(
+		vi.mocked(applicationService.findApplicationById).mockResolvedValue(
 			createApplication({
 				mounts: [
 					{
@@ -188,7 +190,7 @@ describe("service migration preflight", () => {
 						mountPath: "/data",
 					},
 				],
-			}),
+			}) as any,
 		);
 
 		await expect(
@@ -199,10 +201,10 @@ describe("service migration preflight", () => {
 	});
 
 	it("rejects services that are not stopped", async () => {
-		findApplicationByIdMock.mockResolvedValue(
+		vi.mocked(applicationService.findApplicationById).mockResolvedValue(
 			createApplication({
 				applicationStatus: "running",
-			}),
+			}) as any,
 		);
 
 		await expect(
@@ -213,12 +215,17 @@ describe("service migration preflight", () => {
 	});
 
 	it("rejects missing rsync on either server", async () => {
-		execAsyncRemoteMock.mockImplementation(async (serverId: string, command: string) => {
-			if (command.includes("command -v rsync") && serverId === "source-server") {
-				throw new Error("missing rsync");
-			}
-			return { stdout: "", stderr: "" };
-		});
+		vi.mocked(execProcess.execAsyncRemote).mockImplementation(
+			async (serverId: string, command: string) => {
+				if (
+					command.includes("command -v rsync") &&
+					serverId === "source-server"
+				) {
+					throw new Error("missing rsync");
+				}
+				return { stdout: "", stderr: "" } as any;
+			},
+		);
 
 		await expect(
 			buildMigrationLookup("application", "app-1", "target-server"),
@@ -228,7 +235,11 @@ describe("service migration preflight", () => {
 	});
 
 	it("rejects target docker service conflicts", async () => {
-		inspectMock.mockResolvedValue({ id: "docker-service" });
+		vi.mocked(getRemoteDocker).mockResolvedValue({
+			getService: vi.fn(() => ({
+				inspect: vi.fn().mockResolvedValue({ id: "docker-service" }),
+			})),
+		} as any);
 
 		await expect(
 			buildMigrationLookup("application", "app-1", "target-server"),
