@@ -1,3 +1,4 @@
+import copy from "copy-to-clipboard";
 import {
 	ChevronDown,
 	ChevronUp,
@@ -11,7 +12,6 @@ import {
 } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import copy from "copy-to-clipboard";
 import { AlertBlock } from "@/components/shared/alert-block";
 import { DateTooltip } from "@/components/shared/date-tooltip";
 import { DialogAction } from "@/components/shared/dialog-action";
@@ -233,7 +233,6 @@ export const ShowDeployments = ({
 							<span>Webhook URL: </span>
 							<div className="flex flex-row items-center gap-2">
 								<Badge
-									role="button"
 									tabIndex={0}
 									aria-label="Copy webhook URL to clipboard"
 									className="p-2 rounded-md ml-1 mr-1 hover:border-primary hover:text-primary-foreground hover:bg-primary hover:cursor-pointer whitespace-normal break-all"
@@ -250,7 +249,11 @@ export const ShowDeployments = ({
 										toast.success("Copied to clipboard.");
 									}}
 								>
-									{webhookUrl}
+									{webhookUrl.split("/api/deploy/")[0]}
+									/api/deploy/
+									<span className="blur-sm hover:blur-none duration-1000">
+										{webhookUrl.split("/api/deploy/")[1]}
+									</span>
 									<Copy className="h-4 w-4 ml-2" />
 								</Badge>
 								{(type === "application" || type === "compose") && (
