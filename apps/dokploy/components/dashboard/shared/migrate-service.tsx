@@ -48,11 +48,6 @@ interface Props {
 	onSuccess?: () => unknown | Promise<unknown>;
 }
 
-import { nanoid } from "nanoid";
-
-// If you are using Drizzle, you can infer the type like this:
-// export type Server = typeof server.$inferSelect;
-
 export const MOCK_SERVER = {
 	serverId: "blahblahblah",
 	name: "If this is here it means no servers are eligible",
@@ -104,9 +99,7 @@ export const MigrateService = ({
 	const [isMigrating, setIsMigrating] = useState(false);
 	const [isLogDrawerOpen, setIsLogDrawerOpen] = useState(false);
 	const [filteredLogs, setFilteredLogs] = useState<LogLine[]>([]);
-	const { data: servers } = api.server.all.useQuery(undefined, {
-		enabled: isOpen,
-	});
+	const { data: servers } = api.server.all.useQuery();
 
 	const targetServers =
 		servers?.filter(
